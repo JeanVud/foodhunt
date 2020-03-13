@@ -14,7 +14,7 @@ import sqlite3
 from tkinter import *
 
 #INTRO
-path = 'D:/8570w/Python Projects/Foodapp/foodhunt.db'
+path = 'foodhunt.db'
 conn = sqlite3.connect(path)
 c = conn.cursor()
 
@@ -29,7 +29,7 @@ createtable_dishes = """CREATE TABLE IF NOT EXISTS dishes (
                     instruction text,
                     prep text,
                     calories text) """
-createtable_eatout = """CREATE TABLE eatout (
+createtable_eatout = """CREATE TABLE IF NOT EXISTS eatout (
                     eatout_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name text,
                     restaurant text) """
@@ -37,7 +37,7 @@ def createTable(command):
     c.execute(command)
 
 def insertData1():
-    c.execute("""INSERT OR IGNORE INTO dishes(name,type,difficulty) 
+    c.execute("""INSERT OR IGNORE INTO dishes(name,category,prep) 
             VALUES ('dau que xao thit bo','xao','trung binh')""")
 
 def insertData_dishes():
@@ -84,9 +84,10 @@ def insertData_dishes():
     bClear.pack(side=TOP)
 
     def addDish():
-        cmd = """INSERT INTO dishes(name,category,price,note,instruction,prep,calories) 
-                 VALUES (?,?,?,?,?,?,?)"""
-        args = (etName.get(),etCategory.get(),etPrice.get(),etNote.get(),etInstruction.get(),etPrep.get(),etCalories.get())
+        cmd = """INSERT OR IGNORE INTO dishes(name,category,price,note,instruction,prep,calories,frequency) 
+                 VALUES (?,?,?,?,?,?,?,?)"""
+        args = (etName.get(),etCategory.get(),etPrice.get(),etNote.get(),
+                etInstruction.get(),etPrep.get(),etCalories.get(),0)
         c.execute(cmd,args)
         
 
@@ -105,11 +106,11 @@ def insertData_dishes():
 
     c.execute("select * from dishes")
     result = c.fetchall()
-    str = ''
+    here = ''
     for row in result:
-        str += (''.join(row) + "\n")
+        here += str(result) + "\n"
 
-    text.insert(INSERT,str)
+    text.insert(INSERT,here)
 
 
     datatable.mainloop()
@@ -219,12 +220,12 @@ def tableColumns(table):
 createTable(createtable_dishes)
 #insertData1()
 #displayData()
-#c.execute("DROP TABLE dishes")
-#executeRowQuery('dishes','')
+c.execute("DELETE FROM dishes WHERE frequency is null")
+executeRowQuery('dishes','')
 #sqlitemaster()
-#tableColumns('dishes')
+tableColumns('dishes')
 #executeVoidQuery()
-insertData_dishes()
+#insertData_dishes()
 
 
 
